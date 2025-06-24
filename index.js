@@ -1,17 +1,5 @@
-// How long it takes to update the information, in milliseconds. 10000 milliseconds = 10 seconds.
-const ROTATION_INTERVAL = 10000;
-
 const overlayState = {
-  matchModeIndex: 0,
-  currentPlayerModeIndex: 0,
   firstTime: true,
-  intervalID: "",
-  lastDisplayedPlayerHash: "",
-  savedMatchDisplayHash: "",
-  validMatchModes: [],
-
-  matchDisplayModes: ["!bracket", "phase"],
-  displayModes: ["twitter", "pronoun"]
 }
 
 LoadEverything().then(() => {
@@ -60,6 +48,18 @@ LoadEverything().then(() => {
       }
   
       SetInnerHtml($(`.p${t + 1} .score`), String(team.score ?? 0));
+
+      const characterArea = $(`.p${t + 1} .character_area`);
+      const showCharacter = Object.keys(player.character).length > 0 && player.character[1].name
+      toggleVisibility(characterArea, showCharacter);
+
+      CharacterDisplay(
+        $(`.p${t + 1} .character_container`),
+        {
+          source: `score.${window.scoreboardNumber}.team.${t + 1}`,
+        },
+        event
+      );
   
       if (team.color) {
         document.documentElement.style.setProperty(`--p${t + 1}-score-bg-color`, team.color);
@@ -72,12 +72,6 @@ LoadEverything().then(() => {
         ? `<div class='flag' style="background-image: url('https://gepi.global-e.com/content/images/flags/${player.country.code.toLowerCase()}.png')"></div>`
         : "";
       SetInnerHtml(flagContainer, flagHtml);
-
-      if (showFlag) {
-        changeStylesheetRule(`.p${t + 1} .name_container`, "padding", "0 8px");
-      } else {
-        changeStylesheetRule(`.p${t + 1} .name_container`, "padding", "0 12px");
-      }
     });
   
     // === Initial animation ===
@@ -85,11 +79,9 @@ LoadEverything().then(() => {
       const startingAnimation = gsap.timeline({ paused: false })
         .from([".logo_container"], { duration: 0.5, autoAlpha: 0, ease: "power2.inOut" })
         .from([".time_container"], { duration: 0.5, autoAlpha: 0, ease: "power2.inOut"}, "<")
-        // .from([".logo"], { duration: 0.5, autoAlpha: 0, ease: "power2.inOut" })
         .to({}, { duration: 0.25 })
-        .from([".main_container"], { duration: 1.25, x: "1439px", ease: "power2.inOut" });
-
-      // startingAnimation.play();
+        .from([".main_container"], { duration: 1.25, x: "1439px", ease: "power2.inOut" })
+        .from([".character_container"], { duration: 0.5, y: "100px", ease: "elastic.out(0.25, 0.25)" });
 
       updateClock(); // Initial run
       setInterval(updateClock, 1000); // Update every second
@@ -127,6 +119,7 @@ const toggleVisibility = (el, visible) => {
 
   gsap.to(el, {
     duration: 0.5,
+    display: visible ? "block" : "none",
     opacity: visible ? 1 : 0,
     ease: "power2.out"
   });
@@ -147,16 +140,7 @@ const compareObjects = (obj1, obj2) => {
 
 Start = async () => {
   console.log("window.Start() was called");
-  startingAnimation.restart();
 };
-
-function getAvailableDisplayModes(player1, player2, allModes) {
-  return allModes.filter(mode => {
-    const f1 = getPlayerDisplayFieldMap(player1)[mode];
-    const f2 = getPlayerDisplayFieldMap(player2)[mode];
-    return f1 || f2;
-  });
-}
 
 const DisplayEntityName = async (t, nameOrPlayer, isTeam = false) => {
   const selector = `.p${t + 1} .name`;
@@ -182,11 +166,11 @@ const DisplayEntityName = async (t, nameOrPlayer, isTeam = false) => {
   
     const getSuffix = (normalizedCurrent, losers) => {
       if (bothLosers) {
-        return teamNameInWinners === normalizedCurrent ? "WL" : "L";
+        return teamNameInWinners === normalizedCurrent ? "WINNERS→LOSERS" : "LOSERS";
       } else if (neitherLoser) {
         return "";
       } else {
-        return losers ? "L" : "W";
+        return losers ? "LOSERS" : "WINNERS";
       }
     };
     const suffix = getSuffix(normalizedCurrentName, t === 0 ? overlayState.team1Losers : overlayState.team2Losers);
@@ -198,11 +182,11 @@ const DisplayEntityName = async (t, nameOrPlayer, isTeam = false) => {
 
     const getSuffix = (p, losers) => {
       if (bothLosers) {
-        return playerInWinners.name?.toLowerCase() === p.name?.toLowerCase() ? "WL" : "L";
+        return playerInWinners.name?.toLowerCase() === p.name?.toLowerCase() ? "WINNERS→LOSERS" : "LOSERS";
       } else if (neitherLoser) {
         return "";
       } else {
-        return losers ? "L" : "W";
+        return losers ? "LOSERS" : "WINNERS";
       }
     };
 
