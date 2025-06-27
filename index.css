@@ -253,10 +253,6 @@ body {
   height: 92px;
 }
 
-.p1 .tsh_character {
-  transform: scaleX(-1);
-}
-
 .character_container > div > div {
   display: flex;
   align-items: center;
