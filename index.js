@@ -50,7 +50,7 @@ LoadEverything().then(() => {
       SetInnerHtml($(`.p${t + 1} .score`), String(team.score ?? 0));
 
       const characterArea = $(`.p${t + 1} .character_area`);
-      const showCharacter = Object.keys(player.character).length > 0 && player.character[1].name
+      const showCharacter = Object.keys(player.character).length > 0 && player.character[1].name && playerCount === 1;
       toggleVisibility(characterArea, showCharacter);
 
       CharacterDisplay(
