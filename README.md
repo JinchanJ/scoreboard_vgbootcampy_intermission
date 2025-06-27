@@ -5,7 +5,7 @@ A VGBC-style intermission scoreboard overlay built for TournamentStreamHelper fo
 ![Preview Image](/index_preview.png)
 
 ## Recommendation
-It is recommended to turn on the "Shutdown source when not visible" and "Refresh browser when scene becomes active" properties so that the starting animation plays and the scoreboard is updated properly whenever the scene with this scoreboard becomes active.
+It is recommended to turn on the "Shutdown source when not visible" and "Refresh browser when scene becomes active" properties so that the starting animation plays and this scoreboard is updated properly whenever the scene with this scoreboard becomes active.
 
 Also, it might be good to change line 286 in the FitText method in /layout/include/global.js from this:
 ```js
