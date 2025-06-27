@@ -1,1 +1,1 @@
-# scoreboard_vgbootcampy
+# scoreboard_vgbootcampy_intermission
